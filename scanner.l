@@ -59,6 +59,7 @@ int currentLineNum, currentColNum;
 
 BOOLEAN   (true|false)
 
+%x FIELD_SEL_CHECK
 %x ML_COMMENT
 %%             /* BEGIN RULES SECTION */
  /* All patterns and actions should be placed between the start and stop
@@ -108,12 +109,12 @@ void 				{return T_Void;}
 
 
 
-[-]?[0-9]+	{yylval.integerConstant = atoi(yytext);
+[0-9]+	{yylval.integerConstant = atoi(yytext);
 						return T_IntConstant;}
 [0-9]+[uU]	{yylval.integerConstant = atoi(yytext);
 						return T_UintConstant;}
 
-[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?[fF]? 	{yylval.floatConstant = atof(yytext); 
+[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?[fF]? 	{yylval.floatConstant = atof(yytext); 
 							return T_FloatConstant;}
 
 
@@ -138,7 +139,10 @@ void 				{return T_Void;}
 "]"			{return T_RightBracket;}
 "{"			{return T_LeftBrace;}
 "}"			{return T_RightBrace;}
-"."			{return T_Dot;}
+"."		{BEGIN(FIELD_SEL_CHECK);
+		return T_Dot;}
+<FIELD_SEL_CHECK>[_a-zA-Z]+[_a-zA-Z0-9]*	{strncpy(yylval.identifier,yytext,32);
+				return T_FieldSelection;}
 ":"			{return T_Colon;}
 "="			{return T_Equal;}
 ";"			{return T_Semicolon;}
@@ -150,7 +154,7 @@ void 				{return T_Void;}
 ">"			{return T_RightAngle;}
 "?"			{return T_Question;}
 
-[_a-zA-Z]+[_a-zA-Z0-9]*	{strcpy(yylval.identifier,yytext);;
+[_a-zA-Z]+[_a-zA-Z0-9]*	{strncpy(yylval.identifier,yytext,32);;
 												return T_Identifier;}
 
 %%
