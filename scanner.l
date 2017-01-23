@@ -113,6 +113,10 @@ void 				{return T_Void;}
 [0-9]+[uU]	{yylval.integerConstant = atoi(yytext);
 						return T_UintConstant;}
 
+[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?[fF]? 	{yylval.floatConstant = atof(yytext); 
+							return T_FloatConstant;}
+
+
 {BOOLEAN}		{yylval.boolConstant = (yytext[0] == 't');
 						return T_BoolConstant;}
 
@@ -148,6 +152,7 @@ void 				{return T_Void;}
 
 [_a-zA-Z]+[_a-zA-Z0-9]*	{strcpy(yylval.identifier,yytext);;
 												return T_Identifier;}
+
 %%
 
 /* The closing %% above marks the end of the Rules section and the beginning
